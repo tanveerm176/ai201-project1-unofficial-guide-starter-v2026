@@ -1,6 +1,6 @@
 # The Unofficial Guide
 
-<!-- Replace this line with your name and which corpus you picked. -->
+Muhammad Tanveer - City Guides Corpus
 
 > **This file is your submission.** Fill it in as you go — most sections get
 > written during the milestone that produces them, not at the end.
@@ -21,16 +21,17 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This RAG system uses the city guides corpus to answer practical questions
+about traveling around the region. It can answer questions about transportation,
+accessibility, food, lodging, attractions, and the best times to visit each
+place. It retrieves relevant guide sections from the local vector store and
+uses them to generate an answer with a source document. If the documents do
+not contain enough relevant information, the relevance gate refuses to guess.
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size: 800**
+**Overlap: 120**
 
 <!-- What about YOUR documents made you pick these numbers? Short posts and
      long sectioned guides don't want the same chunking, and "800 seemed
@@ -41,6 +42,14 @@
      more than pretending you got it right first time.
 
      Milestone 3. -->
+
+Each city guide is organized into `##` sections such as transportation, food,
+and lodging, and most paragraphs are about 300–400 characters long. I chose
+800 characters so a chunk can usually contain about two related paragraphs,
+while the section-aware chunker keeps the heading with its content and avoids
+combining unrelated sections. I chose 120 characters of overlap so information
+near a sentence boundary remains available in neighboring chunks when a long
+section must be split.
 
 ## Sample Chunks
 
@@ -53,9 +62,7 @@
 
      Milestone 3. -->
 
-
-
-**Chunk 1** — source: guide_accessibility.md#0 `` — produced by: chunker.py::split_documents ``
+**Chunk 1** — source: guide_accessibility.md#0 `— produced by: chunker.py::split_documents`
 
 ```
 # Getting around the region with limited mobility
@@ -64,7 +71,7 @@ An honest assessment rather than a promotional one. Some of these places are
 difficult and it is better to know in advance.
 ```
 
-**Chunk 2** — source: guide_corry_vale.md#6 `` — produced by: chunker.py::split_documents ``
+**Chunk 2** — source: guide_corry_vale.md#6 `— produced by: chunker.py::split_documents`
 
 ```
 ## When to go
@@ -72,7 +79,7 @@ difficult and it is better to know in advance.
 May to September. Outside those months the pub in the third village closes, the farm shop reduces its hours, and several footpaths become genuinely boggy rather than merely wet. The road is not gritted above the second village and is impassable in snow.
 ```
 
-**Chunk 3** — source: guide_givens_mill.md#3 `` — produced by: chunker.py::split_documents ``
+**Chunk 3** — source: guide_givens_mill.md#3 `— produced by: chunker.py::split_documents`
 
 ```
 ## Eat and drink
@@ -80,7 +87,7 @@ May to September. Outside those months the pub in the third village closes, the 
 A tearoom attached to the mill, open 10 to 4 daily except Tuesdays, which sells bread made from the flour ground twenty metres away and is the reason most people come. One pub, food served lunchtimes and Thursday to Saturday evenings.
 ```
 
-**Chunk 4** — source: guide_kestrelford.md#6 `` — produced by: chunker.py::split_documents ``
+**Chunk 4** — source: guide_kestrelford.md#6 `— produced by: chunker.py::split_documents`
 
 ```
 ## When to go
@@ -88,7 +95,7 @@ A tearoom attached to the mill, open 10 to 4 daily except Tuesdays, which sells 
 Late spring and early autumn. The Saturday market runs year-round but is much reduced from November to February. August is busy with walkers. The single-track approach road is genuinely difficult in snow and the town can be cut off for a day or two most winters.
 ```
 
-**Chunk 5** — source: guide_regional_transport.md#1 `` — produced by: chunker.py::split_documents ``
+**Chunk 5** — source: guide_regional_transport.md#1 `— produced by: chunker.py::split_documents`
 
 ```
 ## The railway
@@ -102,19 +109,21 @@ cheaper than that booked a week ahead. There is no ticket office at
 Brightwater station outside weekday mornings; the machine on the platform takes
 cards only.
 ```
+
 ## Sample Answer
 
 <!-- One complete question and answer, pasted as text, with the source line
      visible. Milestone 4. -->
 
-**Question:**
+**Question:How many people live in Brightwater?**
 
 **Answer:**
 
 ```
+Brightwater has a population of about 40,000 people, which roughly doubles during term time (from guide_brightwater.md).
 ```
 
-**My relevance cutoff:**
+**My relevance cutoff: 0.75**
 
 <!-- The number you set in config.py, and how you got there.
 
@@ -125,9 +134,18 @@ cards only.
 
      Milestone 4. -->
 
-| Question | In corpus? | Best distance |
-|---|---|---|
-|  |  |  |
+| Question                                                    | In corpus? | Best distance |
+| ----------------------------------------------------------- | ---------- | ------------- |
+| How many people live in Brightwater?                        | YES        | 0.274         |
+| What did the mill building in Brightwater turn into?        | YES        | 0.428         |
+| Which regions have mixed accessibility?                     | YES        | 0.511         |
+| In Pellew Sands, where is the better cooking located?       | YES        | 0.456         |
+| In Halden Bay what months do prices halve at the inn?       | YES        | 0.454         |
+| What is the capital of Mongolia?                            | NO         | 0.754         |
+| How do I change the oil in a diesel engine?                 | NO         | 0.892         |
+| Who won the 1994 World Cup?                                 | NO         | 0.899         |
+| What is the recommended dosage of ibuprofen for a headache? | NO         | 0.846         |
+| How do I write a for loop in Rust?                          | NO         | 0.813         |
 
 ## How I Used AI
 
@@ -140,9 +158,9 @@ cards only.
 
      Milestone 5. -->
 
-**1.**
+**1. I used Claude to get an overview of the app and how each module related to one another**
 
-**2.**
+**2. I had Claude modify my original chunking function to account for `##` headers after reviewing the documents in my corpus**
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
@@ -169,13 +187,13 @@ cards only.
 
      Milestone 1. -->
 
-| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
-|---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| Criterion                              | Target | Run 1 | Run 2 | Run 3 | Verdict |
+| -------------------------------------- | ------ | ----- | ----- | ----- | ------- |
+| 1. Retrieved chunk contains the answer | 4 of 5 |       |       |       |         |
+| 2. Every answer names a source         | 5 of 5 |       |       |       |         |
+| 3. Gate stops out-of-corpus questions  | 4 of 5 |       |       |       |         |
+| 4.                                     |        |       |       |       |         |
+| 5.                                     |        |       |       |       |         |
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
@@ -192,13 +210,13 @@ cards only.
 
      Milestone 2. -->
 
-| # | Criterion | Verdict | How I decided |
-|---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| #   | Criterion | Verdict | How I decided |
+| --- | --------- | ------- | ------------- |
+| 1   |           |         |               |
+| 2   |           |         |               |
+| 3   |           |         |               |
+| 4   |           |         |               |
+| 5   |           |         |               |
 
 ## Diagnoses
 
@@ -234,13 +252,13 @@ cards only.
 <!-- Same format, same five criteria, three runs each.
      `python run_eval.py --label after` -->
 
-| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
-|---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| Criterion                              | Target | Run 1 | Run 2 | Run 3 | Verdict |
+| -------------------------------------- | ------ | ----- | ----- | ----- | ------- |
+| 1. Retrieved chunk contains the answer | 4 of 5 |       |       |       |         |
+| 2. Every answer names a source         | 5 of 5 |       |       |       |         |
+| 3. Gate stops out-of-corpus questions  | 4 of 5 |       |       |       |         |
+| 4.                                     |        |       |       |       |         |
+| 5.                                     |        |       |       |       |         |
 
 **Did it help?**
 

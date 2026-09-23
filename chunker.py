@@ -23,6 +23,7 @@ your pipeline, not giving up.
 """
 
 from dataclasses import dataclass
+import re
 
 import config
 from ingest import Document
@@ -82,22 +83,72 @@ def fallback_split(
 
 def split_documents(documents: list[Document]) -> list[Chunk]:
     """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+    Split documents into section-aware, approximately fixed-size chunks.
 
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
+    Markdown sections beginning with `##` stay together when they fit within
+    `config.CHUNK_SIZE`. Longer sections are split using the fallback strategy:
+    sentence-aware character windows with up to `config.CHUNK_OVERLAP`
+    characters of overlap. This keeps each section heading with its content
+    instead of combining unrelated sections in one chunk.
 
-    When you write your own strategy, set `produced_by` to
-    "chunker.py::split_documents" so your README's Sample Chunks section names
-    the right function. `app.py chunks` prints that string for you.
-
-    Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
-      - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
+    Chunks are labeled as produced by this function so `app.py chunks` and the
+    README can identify the strategy used.
     """
-    return fallback_split(documents)
+    chunk_size = config.CHUNK_SIZE
+    overlap = config.CHUNK_OVERLAP
+
+    if overlap >= chunk_size:
+        raise ValueError("overlap has to be smaller than chunk_size")
+
+    chunks: list[Chunk] = []
+    sentence_end = re.compile(r"[.!?](?=\s|$)")
+    section_heading = re.compile(r"(?m)^## .*$")
+
+    for doc in documents:
+        index = 0
+        headings = list(section_heading.finditer(doc.text))
+        section_ranges = []
+        if headings and headings[0].start() > 0:
+            section_ranges.append((0, headings[0].start()))
+        section_ranges.extend(
+            (heading.start(), headings[i + 1].start() if i + 1 < len(headings) else len(doc.text))
+            for i, heading in enumerate(headings)
+        )
+        if not section_ranges:
+            section_ranges.append((0, len(doc.text)))
+
+        for section_start, section_end in section_ranges:
+            section = doc.text[section_start:section_end].strip()
+            start = 0
+            while start < len(section):
+                target_end = min(start + chunk_size, len(section))
+                if target_end == len(section):
+                    end = target_end
+                else:
+                    before_target = list(sentence_end.finditer(section, start, target_end))
+                    if before_target:
+                        end = before_target[-1].end()
+                    else:
+                        after_target = sentence_end.search(section, target_end)
+                        end = after_target.end() if after_target else target_end
+
+                piece = section[start:end].strip()
+                if piece:
+                    chunks.append(
+                        Chunk(
+                            text=piece,
+                            source=doc.source,
+                            index=index,
+                            produced_by="chunker.py::split_documents",
+                        )
+                    )
+                    index += 1
+
+                if end >= len(section):
+                    break
+                start = max(end - overlap, start + 1)
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:

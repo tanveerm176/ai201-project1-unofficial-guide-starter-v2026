@@ -53,47 +53,55 @@
 
      Milestone 3. -->
 
-**Chunk 1** — source: thread_bike_commute.txt#0 `` — produced by: chunker.py::fallback_split ``
+
+
+**Chunk 1** — source: guide_accessibility.md#0 `` — produced by: chunker.py::split_documents ``
 
 ```
-THREAD: Is a bike worth it for a 20 minute walk commute?
+# Getting around the region with limited mobility
 
---- reply 1 (14 votes) ---
-Yeah. Cuts an 18 minute walk to about 6. The thing nobody mentions is storage — covered bike parking exists at three buildings and is full by 9am at all three.
-
---- reply 2 (9 votes) ---
-Counterpoint, I sold mine. Between November and March the paths are either icy or salted and salt destroys a drivetrain in one season.
-
---- reply 3 (22 votes) ---
-Both true. I keep a cheap bike for September to November and walk the rest of the year. Total cost was about $120 for the bike and I don't care what happens to it.
-
---- reply 4 (5 votes) ---
-If you do get one, the campus does free registration and it's the only reason I got mine back after it was taken.
-
-For each one, ask: could someone answer a question using only this,
-without reading what came before or after?
+An honest assessment rather than a promotional one. Some of these places are
+difficult and it is better to know in advance.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: guide_corry_vale.md#6 `` — produced by: chunker.py::split_documents ``
 
 ```
+## When to go
+
+May to September. Outside those months the pub in the third village closes, the farm shop reduces its hours, and several footpaths become genuinely boggy rather than merely wet. The road is not gritted above the second village and is impassable in snow.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 3** — source: guide_givens_mill.md#3 `` — produced by: chunker.py::split_documents ``
 
 ```
+## Eat and drink
+
+A tearoom attached to the mill, open 10 to 4 daily except Tuesdays, which sells bread made from the flour ground twenty metres away and is the reason most people come. One pub, food served lunchtimes and Thursday to Saturday evenings.
 ```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 4** — source: guide_kestrelford.md#6 `` — produced by: chunker.py::split_documents ``
 
 ```
+## When to go
+
+Late spring and early autumn. The Saturday market runs year-round but is much reduced from November to February. August is busy with walkers. The single-track approach road is genuinely difficult in snow and the town can be cut off for a day or two most winters.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 5** — source: guide_regional_transport.md#1 `` — produced by: chunker.py::split_documents ``
 
 ```
-```
+## The railway
 
+The line runs along the river valley, connecting Brightwater to the regional
+hub in 50 minutes. Eleven services a day on weekdays, six on Sundays. The line
+north of Brightwater closed in 1963 and everything beyond it is bus or car.
+
+Tickets are cheaper booked the day before than on the day, and considerably
+cheaper than that booked a week ahead. There is no ticket office at
+Brightwater station outside weekday mornings; the machine on the platform takes
+cards only.
+```
 ## Sample Answer
 
 <!-- One complete question and answer, pasted as text, with the source line

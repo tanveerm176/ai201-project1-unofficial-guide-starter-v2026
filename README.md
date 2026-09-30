@@ -249,6 +249,8 @@ Brightwater has a population of about 40,000 people, which roughly doubles durin
 
      Milestone 3. -->
 
+I missed nothing at all in the first pass. All five criteria met their stated targets across all three runs, which means this system cleared the bar from the start, but it also suggests the criteria were intentionally conservative rather than especially demanding. The most obvious target to tighten is criterion 4, “One retrieved chunk contains enough context,” because it was a 4 of 5 requirement and the system was comfortably at 5/5 in every run. I would tighten that target to 5 of 5, since the chunking strategy is already strong enough that a slightly stricter benchmark would still be realistic without making the criterion unfair.
+
 ## The Improvement
 
 **What I changed:**

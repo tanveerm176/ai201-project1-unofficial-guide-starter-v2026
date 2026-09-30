@@ -253,9 +253,9 @@ I missed nothing at all in the first pass. All five criteria met their stated ta
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** I added a hybrid retrieval step in `store.py` that re-ranked the semantic results with BM25 keyword matching so exact place names and numbers could pull relevant chunks up the list.
 
-**Why I picked it:**
+**Why I picked it:** A lot of the questions in this corpus mention specific places, times, and numbers, and semantic similarity alone can miss the exact term even when the correct chunk is nearby.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -267,13 +267,15 @@ I missed nothing at all in the first pass. All five criteria met their stated ta
 
 | Criterion                                       | Target | Run 1 | Run 2 | Run 3 | Verdict |
 | ----------------------------------------------- | ------ | ----- | ----- | ----- | ------- |
-| 1. Retrieved chunk contains the answer          | 4 of 5 |       |       |       |         |
-| 2. Every answer names a source                  | 5 of 5 |       |       |       |         |
-| 3. Gate stops out-of-corpus questions           | 4 of 5 |       |       |       |         |
-| 4. One retreived chunk contains enough context  | 4 of 5 |       |       |       |         |
-| 5. Retrieval is fast enough for interactive use | 4 of 5 |       |       |       |         |
+| 1. Retrieved chunk contains the answer          | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 2. Every answer names a source                  | 5 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 3. Gate stops out-of-corpus questions           | 4 of 5 | 1/5   | 1/5   | 1/5   | MISSED  |
+| 4. One retreived chunk contains enough context  | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 5. Retrieval is fast enough for interactive use | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
 
 **Did it help?**
+
+No. The hybrid rerank kept the in-corpus answers strong, but it hurt the relevance gate: the gate only refused 1 of 5 out-of-scope questions after the change, so criterion 3 moved from a pass to a miss. In other words, the keyword boost made the retrieval more likely to surface near-miss documents that still looked close enough to pass the gate, which is exactly the wrong direction for this criterion.
 
 <!-- Say plainly whether it did, and how you know. If it made things worse,
      say that — a change that backfired, honestly reported, earns full credit

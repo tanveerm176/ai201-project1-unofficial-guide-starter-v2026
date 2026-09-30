@@ -18,8 +18,11 @@ rest of the project if they were wrong:
 """
 
 import os
+import re
 import shutil
 from dataclasses import dataclass
+
+from rank_bm25 import BM25Okapi
 
 # Must be set BEFORE chromadb is imported. Without it, some Chroma versions
 # print "Failed to send telemetry event ..." on every single call — which looks
@@ -178,6 +181,30 @@ def build_index(
     return len(chunks)
 
 
+def _keyword_tokens(text: str) -> list[str]:
+    """Simple normalized tokens for BM25 matching."""
+    return [token for token in re.findall(r"[A-Za-z0-9']+", text.lower()) if len(token) > 1]
+
+
+def _keyword_boosts(question: str, documents: list[str]) -> dict[int, float]:
+    """Give exact-term matches a small ranking boost without discarding semantic results."""
+    query_tokens = [token for token in _keyword_tokens(question) if token not in {"what", "where", "when", "which", "how", "why", "the", "and", "for", "with"}]
+    if not query_tokens:
+        return {}
+
+    tokenized_docs = [_keyword_tokens(doc) for doc in documents]
+    bm25 = BM25Okapi(tokenized_docs)
+    scores = bm25.get_scores(query_tokens)
+    if scores is None or len(scores) == 0 or float(scores.max()) <= 0:
+        return {}
+
+    max_score = float(scores.max())
+    return {
+        idx: max(0.0, min(0.25, 0.25 * (float(score) / max_score)))
+        for idx, score in enumerate(scores)
+    }
+
+
 def search(
     question: str,
     top_k: int | None = None,
@@ -204,20 +231,26 @@ def search(
         n_results=min(top_k, collection.count()),
     )
 
+    documents = list(raw["documents"][0])
+    boosts = _keyword_boosts(question, documents)
+
     results: list[Result] = []
-    for text, meta, distance in zip(
-        raw["documents"][0], raw["metadatas"][0], raw["distances"][0]
+    for idx, (text, meta, distance) in enumerate(
+        zip(raw["documents"][0], raw["metadatas"][0], raw["distances"][0])
     ):
+        adjusted_distance = max(0.0, float(distance) - boosts.get(idx, 0.0))
         results.append(
             Result(
                 text=text,
                 source=str(meta.get("source", "unknown")),
                 label=f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}",
-                distance=float(distance),
+                distance=float(adjusted_distance),
                 produced_by=str(meta.get("produced_by", "unknown")),
             )
         )
-    return results
+
+    results.sort(key=lambda item: item.distance)
+    return results[:top_k]
 
 
 def index_exists(corpus: str | None = None, variant: str = "default") -> bool:

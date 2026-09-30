@@ -189,15 +189,30 @@ Brightwater has a population of about 40,000 people, which roughly doubles durin
 
 | Criterion                              | Target | Run 1 | Run 2 | Run 3 | Verdict |
 | -------------------------------------- | ------ | ----- | ----- | ----- | ------- |
-| 1. Retrieved chunk contains the answer | 4 of 5 |       |       |       |         |
-| 2. Every answer names a source         | 5 of 5 |       |       |       |         |
-| 3. Gate stops out-of-corpus questions  | 4 of 5 |       |       |       |         |
-| 4.                                     |        |       |       |       |         |
-| 5.                                     |        |       |       |       |         |
+| 1. Retrieved chunk contains the answer | 4 of 5 |  4/5  |  4/5  |  4/5  | MET     |
+| 2. Every answer names a source         | 5 of 5 |  5/5  |  5/5  |  5/5  | MET     |
+| 3. Gate stops out-of-corpus questions  | 4 of 5 |  5/5  |  5/5  |  5/5  | MET     |
+| 4. One retreived chunk contains enough context| 4 of 5 |5/5  |  5/5  |  5/5  | MET     |
+| 5. Retrieval is fast enough for interactive use| 4 of 5 |5/5  |  5/5  |  5/5  | MET     |
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
      Name the file and function that produced it. -->
+     Brightwater has a population of about 40,000 people, which roughly doubles during term time (guide_brightwater.md).
+
+     The mill building in Brightwater is now a museum. This information comes from `guide_brightwater.md`.
+
+     Based on the provided documents, there is no mention of which specific region has mixed accessibility. 
+     Source: `guide_accessibility.md`
+
+     In Pellew Sands, the better cooking is located on Marine Terrace, which is one street back from the seafront. 
+
+     Prices roughly halve outside July and August (guide_halden_bay.md).
+
+
+
+
+
 
 ## Verdicts
 
@@ -257,8 +272,8 @@ Brightwater has a population of about 40,000 people, which roughly doubles durin
 | 1. Retrieved chunk contains the answer | 4 of 5 |       |       |       |         |
 | 2. Every answer names a source         | 5 of 5 |       |       |       |         |
 | 3. Gate stops out-of-corpus questions  | 4 of 5 |       |       |       |         |
-| 4.                                     |        |       |       |       |         |
-| 5.                                     |        |       |       |       |         |
+| 4. One retreived chunk contains enough context| 4 of 5 |       |       |       |         |
+| 5. Retrieval is fast enough for interactive use| 4 of 5 |       |       |       |         |
 
 **Did it help?**
 

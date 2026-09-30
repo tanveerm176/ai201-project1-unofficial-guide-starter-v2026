@@ -58,7 +58,7 @@ in at least 4 of 5 tries.
 
 ---
 
-## 4. Something about your chunks
+## 4. One retreived chunk contains enough context
 
 For at least 4 of my 5 test questions, one retrieved chunk should contain
 enough context to answer the question without needing the chunk immediately

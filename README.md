@@ -162,6 +162,8 @@ Brightwater has a population of about 40,000 people, which roughly doubles durin
 
 **2. I had Claude modify my original chunking function to account for `##` headers after reviewing the documents in my corpus**
 
+**3. I used a model to help diagnose why the relevance gate failed after the BM25 rerank. I asked it to compare the in-corpus and out-of-scope distance patterns and explain whether the score gap had narrowed; it pointed out that the keyword boost was pushing near-miss chunks closer to the gate cutoff, so I stopped treating the rerank as a general fix and focused on the gate logic instead.**
+
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
      claims earns nothing.
@@ -294,9 +296,13 @@ No. The hybrid rerank kept the in-corpus answers strong, but it hurt the relevan
 
      Milestone 5. -->
 
+The only criterion still missed after the fix is criterion 3: "The relevance gate stops out-of-corpus questions." The BM25 rerank made the in-corpus answers stay strong, but it also let several clearly off-topic questions sit close enough to the threshold to pass. The mechanism was simple: by boosting chunks with exact keyword overlap, the system moved borderline out-of-scope results closer to the gate, shrinking the distance gap that the gate depends on. My next step would be to separate gate evaluation from retrieval ranking: keep the normal semantic retrieval for answer quality, but run the relevance gate on a cleaner, keyword-agnostic score or a stricter baseline that does not reward near-miss matches. I stopped there because the project timing is limited and this is now a precise, testable issue rather than a vague failure: the problem is not raw retrieval quality, it is the way the gate is being fed by the rerank.
+
 ## What I'd Do Differently
 
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
      Milestone 5. -->
+
+I would rewrite criterion 3 more carefully in the next unit. Right now it says the gate refuses out-of-corpus questions in at least 4 of 5 cases, but that leaves a lot of room for a near-miss answer to slip through when the score gap is small. The better version would measure a clear separation: the gate should refuse out-of-scope questions when their best match is not meaningfully closer than the closest in-corpus question, or the system should require a consistent margin above the threshold. That makes the criterion about the actual decision boundary instead of just a single pass/fail count, which is closer to what the gate is really supposed to guarantee.
